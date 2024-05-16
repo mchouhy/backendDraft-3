@@ -1,7 +1,7 @@
 // Importación del service de carts:
-import { CartService } from "../services/cartService.js";
+import { CartRepository } from "../repositories/cartRepository.js";
 // Llamado de la función constructora:
-const cartService = new CartService();
+const cartRepository = new CartRepository();
 // Importación del model de carts:
 import { cartModel } from "../models/carts.model.js";
 
@@ -9,7 +9,7 @@ import { cartModel } from "../models/carts.model.js";
 export class CartController {
   newCart = async (request, response) => {
     try {
-      const newCart = await cartService.createCart();
+      const newCart = await cartRepository.createCart();
       response.json(newCart);
     } catch (error) {
       response.status(500).json({ error: "Error al crear el cart." });
@@ -39,7 +39,11 @@ export class CartController {
     const prodId = request.params.pid;
     const quantity = request.body.quantity || 1;
     try {
-      const updateCart = await cartService.addProduct(cartId, prodId, quantity);
+      const updateCart = await cartRepository.addProduct(
+        cartId,
+        prodId,
+        quantity
+      );
       response.json(updateCart.products);
     } catch (error) {
       response
@@ -52,7 +56,7 @@ export class CartController {
     const cartId = request.params.cid;
     const prodId = request.params.pid;
     try {
-      const updateCart = await cartService.deleteProduct(cartId, prodId);
+      const updateCart = await cartRepository.deleteProduct(cartId, prodId);
       response.json({
         status: "success",
         message: "Producto eliminado con éxito.",
@@ -72,7 +76,10 @@ export class CartController {
     // Se envía un array de productos en el body de la solicitud:
     const updatedProducts = request.body;
     try {
-      const updatedCart = await cartService.updateCart(cartId, updatedProducts);
+      const updatedCart = await cartRepository.updateCart(
+        cartId,
+        updatedProducts
+      );
       response.json(updatedCart);
     } catch (error) {
       console.log("Error al actualizar el cart", error);
@@ -88,7 +95,7 @@ export class CartController {
     const prodId = request.params.pid;
     const newQuantity = request.body.quantity;
     try {
-      const updatedCart = await cartService.updateProductQuantity(
+      const updatedCart = await cartRepository.updateProductQuantity(
         cartId,
         prodId,
         newQuantity
@@ -113,7 +120,7 @@ export class CartController {
   emptyCart = async (request, response) => {
     const cartId = request.params.cid;
     try {
-      const updatedCart = await cartService.emptyCart(cartId);
+      const updatedCart = await cartRepository.emptyCart(cartId);
       response.json({
         status: "success",
         message: "Se eliminaron con éxito los productos del cart.",

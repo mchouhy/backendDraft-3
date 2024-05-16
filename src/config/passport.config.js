@@ -1,5 +1,6 @@
 // Importación de los módulos de Passport:
 import passport from "passport";
+// Importación de la estrategia local de Passport:
 import { Strategy as LocalStrategy } from "passport-local";
 // Importación de UserModel:
 import UserModel from "../models/user.model.js";
@@ -7,12 +8,38 @@ import UserModel from "../models/user.model.js";
 import { createHash, isValidPassword } from "../utils/hashbcrypt.js";
 // Importación de la estrategia de github de passport:
 import GitHubStrategy from "passport-github2";
-// Importación del CartManager:
-import { CartService } from "../services/cartService.js";
-// Llamado de la función CartManager:
-const cartService = new CartService();
+// Importación de JWT:
+import jwt from "passport-jwt";
+// Traemos la estrategia de JWT:
+const JWTStrategy = jwt.Strategy;
+// Traemos la extracción de JWT:
+const ExtractJWT = jwt.ExtractJwt;
+// // Importación del CartManager:
+// import { CartService } from "../services/cartService.js";
+// // Llamado de la función CartManager:
+// const cartService = new CartService();
 
 const initializePassport = () => {
+  passport.use(
+    "jwt",
+    new JWTStrategy(
+      {
+        jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
+        secretOrKey: "coderhouse",
+      },
+      async (jwt_payload, done) => {
+        try {
+          const user = await UserModel.findById(jwt_payload.user._id);
+          if (!user) {
+            return done(null, false);
+          }
+          return done(null, user);
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
   // Creación de la estrategia de passport para el registro de usuarios:
   passport.use(
     "register",
@@ -116,6 +143,14 @@ const initializePassport = () => {
       }
     )
   );
+};
+
+const cookieExtractor = (request) => {
+  let token = null;
+  if (request && request.cookies) {
+    token = request.cookies["coderCookieToken"];
+  }
+  return token;
 };
 
 export default initializePassport;

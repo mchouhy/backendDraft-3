@@ -1,14 +1,14 @@
 // Importación del service de productos:
-import { ProductService } from "../services/productService.js";
+import { ProductRepository } from "../services/productRepository.js";
 // Llamado de la función constructora:
-const productService = new ProductService();
+const productRepository = new ProductRepository();
 
 // Función de clase constructora del controlador de Carts:
 export class ProductController {
   getProducts = async (request, response) => {
     try {
       const { limit = 2, page = 1, sort, query } = request.query;
-      const products = await productService.getProducts({
+      const products = await productRepository.getProducts({
         limit: parseInt(limit),
         page: parseInt(page),
         sort,
@@ -40,7 +40,7 @@ export class ProductController {
     // Se define la variable que aplica el request params del id a ingresar por el cliente:
     const { prodId } = request.params;
     try {
-      const product = await productService.getProductById(prodId);
+      const product = await productRepository.getProductById(prodId);
       if (!product) {
         return response.json({ error: "Producto no encontrado." });
       }
@@ -55,7 +55,7 @@ export class ProductController {
   addProduct = async (request, response) => {
     const newProduct = request.body;
     try {
-      await productService.addProduct(newProduct);
+      await productRepository.addProduct(newProduct);
       response.status(201).json({ message: "Producto agregado con éxito." });
     } catch (error) {
       response
@@ -68,7 +68,7 @@ export class ProductController {
     const { prodId } = request.params;
     const updatedProduct = request.body;
     try {
-      await productService.updateProduct(prodId, updatedProduct);
+      await productRepository.updateProduct(prodId, updatedProduct);
       response
         .status(201)
         .json({ message: "Producto actualizado exitosamente." });
@@ -82,7 +82,7 @@ export class ProductController {
   deleteProductById = async (request, response) => {
     const { prodId } = request.params;
     try {
-      await productService.deleteProductById(prodId);
+      await productRepository.deleteProductById(prodId);
       response.status(201).json({ message: "Producto eliminado con éxito." });
     } catch (error) {
       response.status(500).json({ error: "No se pudo eliminar el producto." });
