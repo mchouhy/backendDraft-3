@@ -8,22 +8,7 @@ import { CartRepository } from "../repositories/cartRepository.js";
 const cartRepository = new CartRepository();
 
 // Ruta GET para renderizar el cart por id:
-cartViewsRouter.get("/:cid", async (request, response) => {
-  const cartId = request.params.cid;
-  try {
-    const cart = await CartRepository.getCartById(cartId);
-    const cartData = cart.products.map((item) => ({
-      product: item.product.toObject(),
-      quantity: item.quantity,
-    }));
-    response.render("carts", { cartproducts: cartData });
-  } catch (error) {
-    console.log("Error en el servidor al buscar el cart por id", error);
-    response
-      .status(500)
-      .json({ error: "Error en el servidor al intentar obtener el cart." });
-  }
-});
+cartViewsRouter.get("/:cid", async (request, response) => {});
 
 // Exportación del router para ser utilizado en la app:
 export { cartViewsRouter };
