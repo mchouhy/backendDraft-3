@@ -24,14 +24,13 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["user", "admin"],
-    default: "user",
+    enum: ["usuario", "admin"],
+    default: "usuario",
   },
   cart: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Cart",
   },
 });
 
-const UserModel = mongoose.model("user", userSchema);
-
-export default UserModel;
+export const UserModel = mongoose.model("user", userSchema);

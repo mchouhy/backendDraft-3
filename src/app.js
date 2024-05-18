@@ -10,7 +10,7 @@ import { productsApiRouter } from "./routes/api/products.api.router.js";
 // Importación de las rutas del api de carts:
 import { cartsApiRouter } from "./routes/api/carts.api.router.js";
 // Importación de las rutas del api de sessions:
-import sessionsApiRouter from "./routes/api/sessions.api.router.js";
+import sessionsApiRouter from "./routes/api/users.api.router.js";
 // Importación de las rutas de products:
 import { productsViewsRouter } from "./routes/products.views.router.js";
 // Importación de las rutas de carts:

@@ -3,15 +3,15 @@ import { Router } from "express";
 // Creación del Router de Express JS:
 const cartViewsRouter = Router();
 // Importación del manejador de carts:
-import { CartService } from "../services/cartService.js";
+import { CartRepository } from "../repositories/cartRepository.js";
 // Llamado de la función de cartManager:
-const cartService = new CartService();
+const cartRepository = new CartRepository();
 
 // Ruta GET para renderizar el cart por id:
 cartViewsRouter.get("/:cid", async (request, response) => {
   const cartId = request.params.cid;
   try {
-    const cart = await cartService.getCartById(cartId);
+    const cart = await CartRepository.getCartById(cartId);
     const cartData = cart.products.map((item) => ({
       product: item.product.toObject(),
       quantity: item.quantity,

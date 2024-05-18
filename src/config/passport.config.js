@@ -14,6 +14,8 @@ import jwt from "passport-jwt";
 const JWTStrategy = jwt.Strategy;
 // Traemos la extracción de JWT:
 const ExtractJWT = jwt.ExtractJwt;
+// Importación de user model:
+import UserModel from "../models/user.model.js";
 // // Importación del CartManager:
 // import { CartService } from "../services/cartService.js";
 // // Llamado de la función CartManager:
