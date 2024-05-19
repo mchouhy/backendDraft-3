@@ -9,57 +9,48 @@ import { engine } from "express-handlebars";
 import { productsApiRouter } from "./routes/api/products.api.router.js";
 // Importación de las rutas del api de carts:
 import { cartsApiRouter } from "./routes/api/carts.api.router.js";
-// Importación de las rutas del api de sessions:
-import sessionsApiRouter from "./routes/api/users.api.router.js";
-// Importación de las rutas de products:
-import { productsViewsRouter } from "./routes/products.views.router.js";
-// Importación de las rutas de carts:
-import { cartViewsRouter } from "./routes/cart.views.router.js";
-// Importación de las rutas de session:
-import { sessionViewsRouter } from "./routes/session.views.router.js";
+// Importación de las rutas del api de usuarios:
+import { usersApiRouter } from "./routes/api/users.api.router.js";
+// Importación de las rutas de views:
+import viewsRouter from "./routes/views.router.js";
 // Importación de la conexión a la base de datos de Mongo Atlas:
 import "./database.js";
-// Importación de Express Session:
-import session from "express-session";
-// Importación de Mongo Connect para guardar las sesiones de usuario:
-import MongoStore from "connect-mongo";
+// Importación de Cors:
+import cors from "cors";
+// Importación de path:
+import path from "path";
 // Importación de Passport:
 import passport from "passport";
 // Importación de la función para inicializar Passport:
 import initializePassport from "./config/passport.config.js";
 // Importación del objeto de configuración:
 import configObject from "./config/dotenv.config.js";
+// Importación de file to path:
+import { fileURLToPath } from "url";
+// Importación del middleware de auth:
+import { authMiddleware } from "./middlewares/auth.js";
+// Importación de cookie parser:
+import cookieParser from "cookie-parser";
 
 // Variables env:
-const { mongo_url, port } = configObject;
+const { port } = configObject;
 
 // MIDDLEWARES:
-// Directorio raíz desde el cual Express servirá los archivos estáticos cuando se realicen solicitudes HTTP:
-app.use(express.static("./src/public"));
 // Middleware que permite analizar los cuerpos de las solicitudes con datos codificados en URL y hacerlos accesibles en req.body:
 app.use(express.urlencoded({ extended: true }));
 // Función que permite comunicarnos con el servidor en formato JSON:
 app.use(express.json());
-// Middleware de express session:
-app.use(
-  session({
-    secret: "secretCoder",
-    // Permite mantener la sesión abierta ante la inactividad del usuario:
-    resave: true,
-    // Guarda el objeto de sesión aún cuando el mismo no tenga ningún dato para contener:
-    saveUninitialized: true,
-    // Configuración de Mongo Store:
-    store: MongoStore.create({
-      mongoUrl: mongo_url,
-      ttl: 100,
-    }),
-  })
-);
-
-// PASSPORT:
+// Directorio raíz desde el cual Express servirá los archivos estáticos cuando se realicen solicitudes HTTP:
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.join(__dirname, "public")));
+// Función de cors:
+app.use(cors());
+// Passport:
 initializePassport();
 app.use(passport.initialize());
-app.use(passport.session());
+app.use(cookieParser());
+// Middleware de auth de passport:
+app.use(authMiddleware);
 
 // HANDLEBARS:
 // Aplicación del motor de plantillas Handlebars a todos los archivos con la extensión ".handlebars":
@@ -74,23 +65,14 @@ app.set("views", "./src/views");
 app.use("/api/products", productsApiRouter);
 // Endpoint de la ruta de api carts:
 app.use("/api/carts", cartsApiRouter);
-// Endpoint de la ruta de api sessions:
-app.use("/api/sessions", sessionsApiRouter);
-// Endpoint de la ruta de vistas de products:
-app.use("/products", productsViewsRouter);
-// Endpoint de la ruta de vistas del cart:
-app.use("/cart", cartViewsRouter);
-// Endpoint de la ruta de session:
-app.use("/session", sessionViewsRouter);
-
-// RUTA MAIN DE LA APP:
-app.get("/", (request, response) => {
-  response.send("Bienvenido al ecommerce.");
-});
+// Endpoint de la ruta de api users:
+app.use("/api/users", usersApiRouter);
+// Endpoint de la ruta de views:
+app.use("/", viewsRouter);
 
 // PUERTO:
 // Función que escucha cualquier cambio en el servidor:
-app.listen(port, () =>
+const httpServer = app.listen(port, () =>
   console.log(
     `Escuchando cualquier cambio en el puerto: http://localhost:${port}`
   )

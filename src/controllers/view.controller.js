@@ -28,8 +28,6 @@ export class ViewController {
         query,
         sort,
         limit,
-        user,
-        //request.session.user,
       });
     } catch (error) {
       console.log("Error al obtener los productos de la base de datos.", error);
@@ -40,7 +38,7 @@ export class ViewController {
   async renderCart(request, response) {
     const cartId = request.params.cid;
     try {
-      const cart = await CartRepository.getCartById(cartId);
+      const cart = await cartRepository.getCartById(cartId);
       let totalOrder = 0;
       const cartData = cart.products.map((item) => {
         const product = item.product.toObject();

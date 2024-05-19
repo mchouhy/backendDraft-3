@@ -9,11 +9,11 @@
       <br />
       <button
         class="flex items-center justify-center px-4 h-10 text-base font-medium border rounded-lg bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-900 hover:text-white"
-      ><a href="/session/profile">Mi perfil</a></button>
+      ><a href="/api/users/profile">Mi perfil</a></button>
       <br />
       <button
         class="flex items-center justify-center px-4 h-10 text-base font-medium border rounded-lg bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-900 hover:text-white"
-      ><a href="/api/sessions/logout">Cerrar sesión</a></button>
+      ><a href="/api/users/logout">Cerrar sesión</a></button>
     </div>
   {{/if}}
   {{#unless user}}
@@ -22,11 +22,11 @@
       <br />
       <button
         class="flex items-center justify-center px-4 h-10 text-base font-medium border rounded-lg bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-900 hover:text-white"
-      ><a href="/session/register">Registrar usuario</a></button>
+      ><a href="/register">Registrar usuario</a></button>
       <br />
       <button
         class="flex items-center justify-center px-4 h-10 text-base font-medium border rounded-lg bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-900 hover:text-white"
-      ><a href="/session/login">Iniciar sesión</a></button>
+      ><a href="/login">Iniciar sesión</a></button>
     </div>
   {{/unless}}
   <h1

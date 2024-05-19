@@ -32,25 +32,5 @@ usersApiRouter.get(
   userController.admin
 );
 
-//VERSIÓN DE PASSPORT GITHUB:
-usersApiRouter.get(
-  "/github",
-  passport.authenticate("github", {
-    scope: ["user:email"],
-  }),
-  async (request, response) => {}
-);
-
-usersApiRouter.get(
-  "/githubcallback",
-  passport.authenticate("github", { failureRedirect: "/login" }),
-  async (request, response) => {
-    // Agregamos el usuario que viene de Github al objeto de sesión:
-    request.session.user = request.user;
-    request.session.login = true;
-    response.redirect("/profile");
-  }
-);
-
-// Exportación del router del api de Sessions:
-export default usersApiRouter;
+// Exportación del router del api de users:
+export { usersApiRouter };

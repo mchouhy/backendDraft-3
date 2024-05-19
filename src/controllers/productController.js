@@ -1,5 +1,5 @@
 // Importación del service de productos:
-import { ProductRepository } from "../services/productRepository.js";
+import { ProductRepository } from "../repositories/productRepository.js";
 // Llamado de la función constructora:
 const productRepository = new ProductRepository();
 

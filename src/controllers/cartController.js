@@ -4,6 +4,14 @@ import { CartRepository } from "../repositories/cartRepository.js";
 const cartRepository = new CartRepository();
 // Importación del model de carts:
 import { cartModel } from "../models/carts.model.js";
+// Importación del model de tickets:
+import { TicketModel } from "../models/ticket.model.js";
+// Importación del model de usuarios:
+import { UserModel } from "../models/user.model.js";
+// Importación del repo de productos:
+import { ProductRepository } from "../repositories/productRepository.js";
+// Llamado de la función constructora:
+const productRepository = new ProductRepository();
 
 // Función de clase constructora del controlador de Carts:
 export class CartController {
@@ -19,14 +27,14 @@ export class CartController {
   getCartById = async (request, response) => {
     const cartId = request.params.cid;
     try {
-      const cart = await cartModel.findById(cartId);
-      if (!cart) {
+      const cartProducts = await cartRepository.getCartById(cartId);
+      if (!cartProducts) {
         console.log("No existe un cart con el id ingresado.", error);
         return response
           .status(404)
           .json({ error: "Cart por id ingresado no existe." });
       }
-      return response.json(cart.products);
+      return response.json(cartProducts);
     } catch (error) {
       response.status(500).json({
         error: "Error. No se pudo obtener el producto del cart por id.",
@@ -44,6 +52,7 @@ export class CartController {
         prodId,
         quantity
       );
+      const cartID = request.user.cart.toString();
       response.json(updateCart.products);
     } catch (error) {
       response
@@ -132,6 +141,78 @@ export class CartController {
         status: "error",
         error: "Error interno del servidor",
       });
+    }
+  };
+
+  checkOut = async (request, response) => {
+    const cartId = request.params.cid;
+    try {
+      const cart = await cartRepository.getCartById(cartId);
+      const products = cart.products;
+      const noStockProducts = [];
+
+      for (const item of products) {
+        const prodId = item.product;
+        const product = await productRepository.getProductById(prodId);
+        if (product.stock >= item.quantity) {
+          product.stock -= item.quantity;
+          await product.save();
+        } else {
+          noStockProducts.push(prodId);
+        }
+      }
+
+      const cartUser = await UserModel.findOne({ cart: cartId });
+
+      const generateUniqueCode = () => {
+        const characters =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const codeLength = 8;
+        let code = "";
+
+        for (let i = 0; i < codeLength; i++) {
+          const randomIndex = Math.floor(Math.random() * characters.length);
+          code += characters.charAt(randomIndex);
+        }
+
+        const timestamp = Date.now().toString(36);
+        return code + "-" + timestamp;
+      };
+
+      const calcTotal = (products) => {
+        let total = 0;
+
+        products.forEach((item) => {
+          total += item.product.price * item.quantity;
+        });
+
+        return total;
+      };
+
+      const ticket = new TicketModel({
+        code: generateUniqueCode(),
+        purchase_datetime: new Date(),
+        amount: calcTotal(cart.products),
+        purchaser: cartUser._id,
+      });
+      await ticket.save();
+
+      cart.products = cart.products.filter((item) =>
+        noStockProducts.some((prodId) => prodId.equals(item.product))
+      );
+      await cart.save();
+
+      response.render("checkout", {
+        client: cartUser.first_name,
+        email: cartUser.email,
+        ticketNumber: ticket._id,
+      });
+    } catch (error) {
+      response
+        .status(500)
+        .json({
+          error: "Error interno del servidor al intentar hacer el checkout.",
+        });
     }
   };
 }
