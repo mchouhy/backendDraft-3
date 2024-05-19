@@ -91,17 +91,6 @@ const httpServer = app.listen(port, () =>
   )
 );
 
-// Generación de una instancia del módulo socket pasando por argumento la referencia del servidor de Express JS:
-const io = new Server(httpServer);
-
-io.on("connection", (socket) => {
-  console.log("Un cliente se ha conectado.");
-
-  socket.on("message", async (data) => {
-    // Guardado del mensaje en la colección de mensajes de la base de datos de Mongo Atlas:
-    await messageModel.create(data);
-    // Obtención de los mensajes de Mongo Atlas y envío al cliente:
-    const messages = await messageModel.find();
-    io.emit("message", messages);
-  });
-});
+// Generación de instancia del manager de sockets:
+import { SocketManager } from "./sockets/socketManager.js";
+new SocketManager(httpServer);

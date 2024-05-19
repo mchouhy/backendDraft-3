@@ -1,14 +1,19 @@
-<h1 class="bg-red-400 flex justify-center p-8 mb-3">Bienvenido al chat:</h1>
-
-<div class="bg-black">
-  <div class="flex justify-center p-4">
-    <label for="">Mensaje: </label>
-    <br />
-    <input class="text-black border-s-violet-950" type="text" id="chatBox" />
+<div
+  class="fixed top-0 left-0 z-[-2] w-screen min-h-screen bg-gray-700 bg-[radial-gradient(100%_50%_at_50%_0%,rgba(0,163,255,0.13)_0,rgba(0,163,255,0)_50%,rgba(0,163,255,0)_100%)]"
+>
+  <div class="flex justify-center items-center gap-3 my-8">
+    <h2 class="text-white text-2xl m-auto">¡Bienvenido al chat!</h2>
   </div>
-
   <div>
-    <p id="messagesLogs"></p>
+    <div class="flex justify-center p-4 gap-x-2">
+      <label for="">Mensaje: </label>
+      <br />
+      <input class="text-black border-s-violet-950" type="text" id="chatBox" />
+    </div>
+
+    <div class="">
+      <p id="messagesLogs"></p>
+    </div>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
