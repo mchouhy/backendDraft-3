@@ -5,6 +5,7 @@ import express from "express";
 const app = express();
 // Importación del motor de plantillas Handlebars (https://www.npmjs.com/package/express-handlebars):
 import { engine } from "express-handlebars";
+import Handlebars from "handlebars";
 // Importación de las rutas del api de productos:
 import { productsApiRouter } from "./routes/api/products.api.router.js";
 // Importación de las rutas del api de carts:
@@ -31,6 +32,10 @@ import { fileURLToPath } from "url";
 import { authMiddleware } from "./middlewares/auth.js";
 // Importación de cookie parser:
 import cookieParser from "cookie-parser";
+// Importación del Socket.io (https://socket.io/docs/v4/tutorial/introduction):
+import { Server } from "socket.io";
+// Importación del model de mensajes:
+import { messageModel } from "./models/message.model.js";
 
 // Variables env:
 const { port } = configObject;
@@ -53,8 +58,16 @@ app.use(cookieParser());
 app.use(authMiddleware);
 
 // HANDLEBARS:
+// Crea una instancia del motor de plantillas Handlebars:
+const hbs = engine({
+  handlebars: Handlebars,
+});
 // Aplicación del motor de plantillas Handlebars a todos los archivos con la extensión ".handlebars":
-app.engine("handlebars", engine());
+app.engine("handlebars", hbs);
+// Registra el helper 'hasRole'
+Handlebars.registerHelper("hasRole", function (roles, role, options) {
+  return roles.includes(role) ? options.fn(this) : options.inverse(this);
+});
 // Renderización de las vistas de la aplicación a través de Handlebars:
 app.set("view engine", "handlebars");
 // Directorio raíz desde el cual deben leerse los archivos con la extensión ".handlebars":
@@ -77,3 +90,18 @@ const httpServer = app.listen(port, () =>
     `Escuchando cualquier cambio en el puerto: http://localhost:${port}`
   )
 );
+
+// Generación de una instancia del módulo socket pasando por argumento la referencia del servidor de Express JS:
+const io = new Server(httpServer);
+
+io.on("connection", (socket) => {
+  console.log("Un cliente se ha conectado.");
+
+  socket.on("message", async (data) => {
+    // Guardado del mensaje en la colección de mensajes de la base de datos de Mongo Atlas:
+    await messageModel.create(data);
+    // Obtención de los mensajes de Mongo Atlas y envío al cliente:
+    const messages = await messageModel.find();
+    io.emit("message", messages);
+  });
+});
