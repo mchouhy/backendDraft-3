@@ -2,6 +2,7 @@ import { ProductRepository } from "../repositories/productRepository.js";
 import { CartRepository } from "../repositories/cartRepository.js";
 const productRepository = new ProductRepository();
 const cartRepository = new CartRepository();
+import { UserDTO } from "../dto/user.dto.js";
 
 export class ViewController {
   async renderProducts(request, response) {
@@ -17,6 +18,15 @@ export class ViewController {
         const { _id, ...rest } = product.toObject();
         return rest;
       });
+
+      const user = request.user
+        ? new UserDTO(
+            request.user.first_name,
+            request.user.last_name,
+            request.user.role
+          )
+        : null;
+
       response.render("products", {
         products: productsArray,
         currentPage: products.page,
@@ -28,6 +38,8 @@ export class ViewController {
         query,
         sort,
         limit,
+        user,
+        isAdmin: user && user.role === "admin",
       });
     } catch (error) {
       console.log("Error al obtener los productos de la base de datos.", error);
