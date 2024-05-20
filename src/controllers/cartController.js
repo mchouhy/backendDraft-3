@@ -47,13 +47,10 @@ export class CartController {
     const prodId = request.params.pid;
     const quantity = request.body.quantity || 1;
     try {
-      const updateCart = await cartRepository.addProduct(
-        cartId,
-        prodId,
-        quantity
-      );
+      await cartRepository.addProduct(cartId, prodId, quantity);
       const cartID = request.user.cart.toString();
-      response.json(updateCart.products);
+      //response.json(updateCart.products);
+      response.redirect(`/carts/${cartID}`);
     } catch (error) {
       response
         .status(500)
@@ -208,11 +205,9 @@ export class CartController {
         ticketNumber: ticket._id,
       });
     } catch (error) {
-      response
-        .status(500)
-        .json({
-          error: "Error interno del servidor al intentar hacer el checkout.",
-        });
+      response.status(500).json({
+        error: "Error interno del servidor al intentar hacer el checkout.",
+      });
     }
   };
 }
