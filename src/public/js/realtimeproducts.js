@@ -2,12 +2,6 @@
 console.log("Handlebars funcionando correctamente.");
 // Generación de una instancia de socket del lado del cliente:
 const socket = io();
-// Generación de un mensaje emitido por cliente:
-socket.emit("client-message", "Soy el cliente enviando un mensaje.");
-// Recibiendo mensaje emitido por el servidor en app.js:
-socket.on("server-message", (data) => {
-  console.log(data);
-});
 
 document.addEventListener("DOMContentLoaded", () => {
   // Variable que aloja el formulario para agregar productos.
@@ -44,7 +38,7 @@ const deleteProductForm = document.getElementById("deleteProductForm");
 deleteProductForm.addEventListener("submit", (e) => {
   e.preventDefault();
   console.log("Delete product submit");
-  let idInput = parseInt(document.getElementById("id").value);
+  let idInput = document.getElementById("id").value;
 
   const prodId = idInput;
 
@@ -53,20 +47,22 @@ deleteProductForm.addEventListener("submit", (e) => {
   deleteProductForm.reset();
 });
 
-socket.on("products", (data) => {
+socket.on("products", (responseData) => {
   const productsCards = document.getElementById("productsRT");
   productsCards.innerHTML = "";
-  data.forEach((product) => {
-    let productCard = document.createElement("div");
-    productCard.className = "product-container";
-    productCard.innerHTML = `
-            <h2>Nombre:<br> ${product.title}</h2>
-            <p>Descripción:<br> ${product.description}</p>
-            <p>Precio:<br> €${product.price}</p>
-            <p>Id:<br> ${product.id}</p>
-            `;
-    productsCards.appendChild(productCard);
-  });
+  if (Array.isArray(responseData.data)) {
+    responseData.data.forEach((product) => {
+      let productCard = document.createElement("div");
+      productCard.className = "product-container";
+      productCard.innerHTML = `
+              <h2>Nombre:<br> ${product.title}</h2>
+              <p>Descripción:<br> ${product.description}</p>
+              <p>Precio:<br> €${product.price}</p>
+              <p>Id:<br> ${product._id}</p>
+              `;
+      productsCards.appendChild(productCard);
+    });
+  }
 });
 
 socket.on("error", async (data) => {

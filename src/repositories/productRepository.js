@@ -74,15 +74,7 @@ export class ProductRepository {
   }) => {
     try {
       // Validación para que de error en caso de que falte completar un campo requerido:
-      if (
-        !title ||
-        !description ||
-        !code ||
-        !price ||
-        !stock ||
-        !category ||
-        !thumbnails
-      ) {
+      if (!title || !description || !code || !price || !stock || !category) {
         return console.log(
           "Error. Es obligatorio completar todos los campos para agregar el producto."
         );

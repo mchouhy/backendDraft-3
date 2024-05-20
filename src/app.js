@@ -5,6 +5,7 @@ import express from "express";
 const app = express();
 // Importación del motor de plantillas Handlebars (https://www.npmjs.com/package/express-handlebars):
 import { engine } from "express-handlebars";
+// Importación del módulo handlebarse para utilizar un helper personalizado:
 import Handlebars from "handlebars";
 // Importación de las rutas del api de productos:
 import { productsApiRouter } from "./routes/api/products.api.router.js";
