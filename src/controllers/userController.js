@@ -97,7 +97,7 @@ export class UserController {
 
   async logout(request, response) {
     response.clearCookie("coderCookieToken");
-    response.redirect("/login");
+    response.redirect("/");
   }
 
   async admin(request, response) {
